@@ -78,7 +78,7 @@ def walk_and_store(start_id=tukallo_id, lang="", limit=100):
 
     # bfs is finished, time to save programmers we found
     programmers = programmers.sort_values(by=['rank'], ascending=False)
-    programmers.to_csv(start_user[1] + start_user[2] + str(limit) + lang + ".csv")
+    programmers.to_csv('processed/' + start_user[1] + start_user[2] + str(limit) + lang + ".csv")
 
 
 def get_developers(vk_id=tukallo_id, lang='', limit=10):
