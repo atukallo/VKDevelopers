@@ -1,10 +1,10 @@
 import vk_api
 from github import Github
 
-KEY_WORDS_PATH = "key_words"
-LANGUAGES_PATH = "languages"
-COMPANIES_PATH = "companies"
-GROUPS_PATH = "groups"
+KEY_WORDS_PATH = "substrings/key_words"
+LANGUAGES_PATH = "substrings/languages"
+COMPANIES_PATH = "substrings/companies"
+GROUPS_PATH = "substrings/groups"
 
 KEY_WORDS = []
 LANGUAGES = []
