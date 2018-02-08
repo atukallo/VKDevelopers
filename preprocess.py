@@ -3,7 +3,7 @@ import collections
 import pandas as pd
 import vk_api
 
-import analyzis
+import analysis
 
 vk = None
 tukallo_id = '125376958'
@@ -18,7 +18,7 @@ def get_score(id):
             depicting assurance, that a user is a programmer,
             lang_stat is user's statistics about programming languages from LANGUAGES
     """
-    return analyzis.analyze_user(id, vk)
+    return analysis.analyze_user(id, vk)
 
 
 def get_max(d: dict):
