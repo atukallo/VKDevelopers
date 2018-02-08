@@ -18,10 +18,10 @@ def get_score(id):
             depicting assurance, that a user is a programmer,
             language is user's favourite programming language if any, else "-"
     """
-    return analyzis.analyze_user(id, vk), "-"
+    return analyzis.analyze_user(id, vk)
 
 
-def walk_and_store(start=default_user, limit=200, lang=""):
+def walk_and_store(start=default_user, limit=50, lang=""):
     programmers = pd.DataFrame(columns=('id', 'first_name', 'last_name', 'rank', 'language', 'link'))
 
     observed_users = set()
@@ -45,7 +45,7 @@ def walk_and_store(start=default_user, limit=200, lang=""):
             continue
 
         score = get_score(cur_user[0])
-        if score[0] >= SCORE_THRESHOLD:
+        if score[0] >= SCORE_THRESHOLD and (lang == '' or lang == score[1]):
             link = 'https://vk.com/id' + str(cur_user[0])
             programmers.loc[len(programmers)] = [*cur_user, *score, link]
             if len(programmers) >= limit:

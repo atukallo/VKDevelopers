@@ -4,14 +4,16 @@ from github import Github
 KEY_WORDS_PATH = "key_words"
 LANGUAGES_PATH = "languages"
 COMPANIES_PATH = "companies"
+GROUPS_PATH = "groups"
 
 KEY_WORDS = []
 LANGUAGES = []
 COMPANIES = []
+GROUPS = []
 
 
 def read_files():
-    global KEY_WORDS, LANGUAGES, COMPANIES
+    global KEY_WORDS, LANGUAGES, COMPANIES, GROUPS
 
     def read(path):
         with open(path) as file:
@@ -20,6 +22,7 @@ def read_files():
     KEY_WORDS = read(KEY_WORDS_PATH)
     LANGUAGES = read(LANGUAGES_PATH)
     COMPANIES = read(COMPANIES_PATH)
+    GROUPS = read(GROUPS_PATH)
 
 
 read_files()
@@ -44,6 +47,7 @@ def analyze_user(id, vkk):
     vk = vkk
 
     rating = 0
+    lang = '-'
 
     lang_stats = {}
     for l in LANGUAGES:
@@ -64,28 +68,40 @@ def analyze_user(id, vkk):
         if 'site' in user_info:
             rating += analyze_github(user_info['site'], lang_stats)
 
-        groups = vk.groups.get(user_id=id, filter='groups,publics', extended=1, fields='name')
-        rating += analyze_groups(groups, lang_stats)
+        try:
+            groups = vk.groups.get(user_id=id, filter='groups,publics', extended=1, fields='name')
+            rating += analyze_groups(groups, lang_stats)
+        except vk_api.exceptions.ApiError as error_msg:
+            pass  # access to groups denied
 
-        print('Got rating ' + str(rating))
-        return min(rating, 10)
+        print('Got rating ' + str(rating) + ' with stats: ' + str(lang_stats))
+
+        # let's find most popular language
+        m = 0
+        for l in lang_stats:
+            val = lang_stats[l]
+            if val > m:
+                lang = l
+                m = val
+
+        return min(rating, 10), lang
 
     except vk_api.exceptions.ApiError as error_msg:
         print(error_msg)
-        return 0
-
-
-def analyze_language(groups, career):
-    pass
+        return rating, lang
 
 
 # gives max of 3
 def analyze_groups(groups, lang_stats):
     rating = 0
-    print(groups)
+    # print('Groups: ' + str(groups))
     for group in groups['items']:
-        print(group)
-        pass
+        group_name = group['name'].lower()
+        if contains_any(group_name, GROUPS):
+            rating += 1
+        for l in LANGUAGES:
+            if group_name.find(l) != -1:
+                lang_stats[l] += 1
     return min(rating, 3)
 
 
@@ -139,5 +155,6 @@ def analyze_github(site: str, lang_stats: dict):
             else:
                 print('Language ' + l + ' is ignored')
     except Exception as e:
-        print(e)
+        # print(e)
+        pass
     return 5  # return score of 5 for rating
